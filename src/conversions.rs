@@ -1,5 +1,5 @@
-use crate::formats::{RGB, HSV, Hex};
 use crate::errors::InvalidColourFormat;
+use crate::formats::{Hex, HSV, RGB};
 
 pub fn rgb_to_hsv(rgb: &RGB) -> Result<HSV, InvalidColourFormat> {
     // Adapted from https://www.geeksforgeeks.org/program-change-rgb-color-model-hsv-color-model/
@@ -7,10 +7,7 @@ pub fn rgb_to_hsv(rgb: &RGB) -> Result<HSV, InvalidColourFormat> {
     let g: f32 = *rgb.g() as f32 / 255.0;
     let b: f32 = *rgb.b() as f32 / 255.0;
 
-    let max: f32 = *[r, g, b]
-        .iter()
-        .max_by(|a, b| a.total_cmp(b))
-        .unwrap();
+    let max: f32 = *[r, g, b].iter().max_by(|a, b| a.total_cmp(b)).unwrap();
 
     let min: f32 = *[r, g, b]
         .iter()
@@ -40,7 +37,7 @@ pub fn rgb_to_hsv(rgb: &RGB) -> Result<HSV, InvalidColourFormat> {
     } else {
         s = (d / max) * 100.0;
     }
-    
+
     v = max * 100.0;
 
     HSV::new(h, s, v)
@@ -56,7 +53,7 @@ pub fn hsv_to_rgb(hsv: &HSV) -> Result<RGB, InvalidColourFormat> {
     let c: f32 = hsv.v() * hsv.s();
     let x: f32 = c * (1.0 - ((hsv.h() / 60.0) % 2.0 - 1.0).abs());
     let m: f32 = hsv.v() - c;
-    
+
     let r_prime: f32;
     let g_prime: f32;
     let b_prime: f32;
@@ -96,7 +93,7 @@ pub fn hsv_to_rgb(hsv: &HSV) -> Result<RGB, InvalidColourFormat> {
 
 pub fn hsv_to_hex(hsv: &HSV) -> Result<Hex, InvalidColourFormat> {
     rgb_to_hex(&hsv_to_rgb(hsv).unwrap()) // This nested conversion seems like the fastest way - rgb to
-                                              // hex is trivial
+                                          // hex is trivial
 }
 
 pub fn hex_to_rgb(hex: &Hex) -> Result<RGB, InvalidColourFormat> {
@@ -108,7 +105,7 @@ pub fn hex_to_rgb(hex: &Hex) -> Result<RGB, InvalidColourFormat> {
 
 pub fn hex_to_hsv(hex: &Hex) -> Result<HSV, InvalidColourFormat> {
     rgb_to_hsv(&hex_to_rgb(hex).unwrap()) // This nested conversion seems like the fastest way - hex to
-                                              // rgb is trivial
+                                          // rgb is trivial
 }
 
 #[cfg(test)]

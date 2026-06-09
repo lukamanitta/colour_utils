@@ -1,17 +1,18 @@
-pub mod formats;
 pub mod conversions;
 pub mod errors;
+pub mod formats;
 pub mod operations;
 
 use regex::Regex;
 
-use formats::{RGB, HSV, Hex};
 use errors::InvalidColourFormat;
+use formats::{Hex, HSV, RGB};
 
 const RGB_REGEX_STRING: &str = r"^rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)$";
 const HSV_REGEX_STRING: &str = r"^hsv\((\d+(?:\.\d+)?), (\d+(?:\.\d+)?), (\d+(?:\.\d+)?)\)$";
 const HEX_REGEX_STRING: &str = r"^#(\d|\w){6}$";
 
+#[derive(Clone)]
 pub struct Colour {
     rgb: RGB,
     hsv: HSV,
@@ -27,11 +28,23 @@ impl Colour {
         if rgb_regex.is_match(&string) {
             let captures = rgb_regex.captures(&string).unwrap();
 
-            let r = captures.get(1).unwrap().as_str().parse::<u8>()
+            let r = captures
+                .get(1)
+                .unwrap()
+                .as_str()
+                .parse::<u8>()
                 .map_err(|_err| InvalidColourFormat::FormatNotRecognisedError)?;
-            let g = captures.get(2).unwrap().as_str().parse::<u8>()
+            let g = captures
+                .get(2)
+                .unwrap()
+                .as_str()
+                .parse::<u8>()
                 .map_err(|_err| InvalidColourFormat::FormatNotRecognisedError)?;
-            let b = captures.get(3).unwrap().as_str().parse::<u8>()
+            let b = captures
+                .get(3)
+                .unwrap()
+                .as_str()
+                .parse::<u8>()
                 .map_err(|_err| InvalidColourFormat::FormatNotRecognisedError)?;
             return Colour::new_from_rgb(r, g, b);
         }
@@ -39,11 +52,23 @@ impl Colour {
         if hsv_regex.is_match(&string) {
             let captures = hsv_regex.captures(&string).unwrap();
 
-            let h = captures.get(1).unwrap().as_str().parse::<f32>()
+            let h = captures
+                .get(1)
+                .unwrap()
+                .as_str()
+                .parse::<f32>()
                 .map_err(|_err| InvalidColourFormat::FormatNotRecognisedError)?;
-            let s = captures.get(2).unwrap().as_str().parse::<f32>()
+            let s = captures
+                .get(2)
+                .unwrap()
+                .as_str()
+                .parse::<f32>()
                 .map_err(|_err| InvalidColourFormat::FormatNotRecognisedError)?;
-            let v = captures.get(3).unwrap().as_str().parse::<f32>()
+            let v = captures
+                .get(3)
+                .unwrap()
+                .as_str()
+                .parse::<f32>()
                 .map_err(|_err| InvalidColourFormat::FormatNotRecognisedError)?;
 
             return Colour::new_from_hsv(h, s, v);
@@ -54,7 +79,6 @@ impl Colour {
         }
 
         Err(InvalidColourFormat::FormatNotRecognisedError)
-
     }
 
     pub fn new_from_rgb(r: u8, g: u8, b: u8) -> Result<Colour, InvalidColourFormat> {

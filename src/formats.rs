@@ -53,7 +53,8 @@ impl HSV {
     pub fn new(h: f32, s: f32, v: f32) -> Result<Self, InvalidColourFormat> {
         if !within_bounds(h, 0.0, 360.0)
             || !within_bounds(s, 0.0, 100.0)
-            || !within_bounds(v, 0.0, 100.0) {
+            || !within_bounds(v, 0.0, 100.0)
+        {
             Err(InvalidColourFormat::ArgOutOfBoundsError)
         } else {
             Ok(Self { h, s, v })
@@ -112,9 +113,7 @@ impl Hex {
         let g = u8::from_str_radix(&g_slice, 16)?;
         let b = u8::from_str_radix(&b_slice, 16)?;
 
-        if !within_bounds(r, 0, 255)
-            || !within_bounds(g, 0, 255)
-            || !within_bounds(b, 0, 255) {
+        if !within_bounds(r, 0, 255) || !within_bounds(g, 0, 255) || !within_bounds(b, 0, 255) {
             Err(InvalidColourFormat::ArgOutOfBoundsError)
         } else {
             Ok(Self {
@@ -155,7 +154,14 @@ mod tests {
     #[test]
     fn rgb_new_works() {
         let rgb = RGB::new(255, 0, 255);
-        assert_eq!(rgb, Ok(RGB { r: 255, g: 0, b: 255 }));
+        assert_eq!(
+            rgb,
+            Ok(RGB {
+                r: 255,
+                g: 0,
+                b: 255
+            })
+        );
     }
 
     // #[test]
@@ -174,7 +180,14 @@ mod tests {
     #[test]
     fn hsv_new_works() {
         let hsv = HSV::new(300.0, 100.0, 100.0);
-        assert_eq!(hsv, Ok(HSV { h: 300.0, s: 100.0, v: 100.0 }));
+        assert_eq!(
+            hsv,
+            Ok(HSV {
+                h: 300.0,
+                s: 100.0,
+                v: 100.0
+            })
+        );
     }
 
     #[test]

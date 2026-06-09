@@ -1,5 +1,5 @@
-use crate::Colour;
 use crate::errors::InvalidColourFormat;
+use crate::Colour;
 
 fn clamp(value: f32, min: f32, max: f32) -> f32 {
     if value < min {
@@ -11,7 +11,10 @@ fn clamp(value: f32, min: f32, max: f32) -> f32 {
     }
 }
 
-pub fn multiply_brightness(colour: &Colour, multiplier: f32) -> Result<Colour, InvalidColourFormat> {
+pub fn multiply_brightness(
+    colour: &Colour,
+    multiplier: f32,
+) -> Result<Colour, InvalidColourFormat> {
     Colour::new_from_hsv(
         *colour.hsv().h(),
         *colour.hsv().s(),
@@ -43,11 +46,18 @@ pub fn invert_brightness(colour: &Colour) -> Result<Colour, InvalidColourFormat>
     )
 }
 
-pub fn blend(colour1: &Colour, colour2: &Colour, ratio: f32) -> Result<Colour, InvalidColourFormat> {
+pub fn blend(
+    colour1: &Colour,
+    colour2: &Colour,
+    ratio: f32,
+) -> Result<Colour, InvalidColourFormat> {
     Colour::new_from_rgb(
-        (*colour1.rgb().r() as f32 * (1.0 - ratio) + *colour2.rgb().r() as f32 * ratio).round() as u8,
-        (*colour1.rgb().g() as f32 * (1.0 - ratio) + *colour2.rgb().g() as f32 * ratio).round() as u8,
-        (*colour1.rgb().b() as f32 * (1.0 - ratio) + *colour2.rgb().b() as f32 * ratio).round() as u8,
+        (*colour1.rgb().r() as f32 * (1.0 - ratio) + *colour2.rgb().r() as f32 * ratio).round()
+            as u8,
+        (*colour1.rgb().g() as f32 * (1.0 - ratio) + *colour2.rgb().g() as f32 * ratio).round()
+            as u8,
+        (*colour1.rgb().b() as f32 * (1.0 - ratio) + *colour2.rgb().b() as f32 * ratio).round()
+            as u8,
     )
 }
 
@@ -56,7 +66,5 @@ mod tests {
     // use super::*;
 
     #[test]
-    pub fn it_works() {
-
-    }
+    pub fn it_works() {}
 }
