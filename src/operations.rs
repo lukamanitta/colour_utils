@@ -27,7 +27,7 @@ pub fn lighten(colour: &Colour, multiplier: f32) -> Result<Colour, InvalidColour
 }
 
 pub fn darken(colour: &Colour, multiplier: f32) -> Result<Colour, InvalidColourFormat> {
-    multiply_brightness(colour, -multiplier)
+    multiply_brightness(colour, 1.0 / multiplier)
 }
 
 pub fn invert(colour: &Colour) -> Result<Colour, InvalidColourFormat> {
