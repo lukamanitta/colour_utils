@@ -50,39 +50,29 @@ pub fn rgb_to_hex(rgb: &RGB) -> Result<Hex, InvalidColourFormat> {
 pub fn hsv_to_rgb(hsv: &HSV) -> Result<RGB, InvalidColourFormat> {
     // Adapted from https://www.rapidtables.com/convert/color/hsv-to-rgb.html
 
-    let c: f32 = hsv.v() * hsv.s();
-    let x: f32 = c * (1.0 - ((hsv.h() / 60.0) % 2.0 - 1.0).abs());
-    let m: f32 = hsv.v() - c;
+    let hp: f32 = hsv.h() / 60.0;
+    let s: f32 = hsv.s() / 100.0;
+    let v: f32 = hsv.v() / 100.0;
 
-    let r_prime: f32;
-    let g_prime: f32;
-    let b_prime: f32;
+    let c: f32 = v * s;
+    let x: f32 = c * (1.0 - (hp % 2.0 - 1.0).abs());
+    let m: f32 = v - c;
 
-    let i: u8 = (hsv.h() / 60.0).floor() as u8;
-
-    match i {
-        0 => {
-            (r_prime, g_prime, b_prime) = (c, x, 0.0);
-        }
-        1 => {
-            (r_prime, g_prime, b_prime) = (x, c, 0.0);
-        }
-        2 => {
-            (r_prime, g_prime, b_prime) = (0.0, c, x);
-        }
-        3 => {
-            (r_prime, g_prime, b_prime) = (0.0, x, c);
-        }
-        4 => {
-            (r_prime, g_prime, b_prime) = (x, 0.0, c);
-        }
-        5 => {
-            (r_prime, g_prime, b_prime) = (c, 0.0, x);
-        }
-        _ => {
-            return Err(InvalidColourFormat::FailedConversionError);
-        }
-    }
+    let (r_prime, g_prime, b_prime) = if (0.0..1.0).contains(&hp) {
+        (c, x, 0.0)
+    } else if (1.0..2.0).contains(&hp) {
+        (x, c, 0.0)
+    } else if (2.0..3.0).contains(&hp) {
+        (0.0, c, x)
+    } else if (3.0..4.0).contains(&hp) {
+        (0.0, x, c)
+    } else if (4.0..5.0).contains(&hp) {
+        (x, 0.0, c)
+    } else if (5.0..6.0).contains(&hp) {
+        (c, 0.0, x)
+    } else {
+        return Err(InvalidColourFormat::FailedConversionError);
+    };
 
     RGB::new(
         ((r_prime + m) * 255.0).round() as u8,
