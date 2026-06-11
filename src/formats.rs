@@ -1,52 +1,190 @@
 use crate::errors::InvalidColourFormat;
+use std::fmt;
 
 fn within_bounds<T: PartialOrd<T>>(val: T, min: T, max: T) -> bool {
     min <= val && val <= max
 }
 
-#[derive(Clone, Debug, PartialEq)]
+pub trait RGBFormat {
+    fn r(&self) -> &u8;
+    fn g(&self) -> &u8;
+    fn b(&self) -> &u8;
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct RGB {
-    r: u8,
-    g: u8,
-    b: u8,
+    _r: u8,
+    _g: u8,
+    _b: u8,
 }
 
 impl RGB {
     pub fn new(r: u8, g: u8, b: u8) -> Result<Self, InvalidColourFormat> {
-        // TODO: work out how to properly handle range error, because it will arise at function
-        // call
-        // u8 can only be 0-255 anyway
-        // if !within_bounds(r, 0, 255)
-        //     || !within_bounds(g, 0, 255)
-        //     || !within_bounds(b, 0, 255) {
-        //     Err(InvalidColourFormat::ArgOutOfBoundsError)
-        // } else {
-        Ok(Self { r, g, b })
-        // }
-    }
-
-    pub fn to_string(&self) -> String {
-        format!("rgb({}, {}, {})", self.r, self.g, self.b)
-    }
-
-    pub fn r(&self) -> &u8 {
-        &self.r
-    }
-
-    pub fn g(&self) -> &u8 {
-        &self.g
-    }
-
-    pub fn b(&self) -> &u8 {
-        &self.b
+        Ok(Self {
+            _r: r,
+            _g: g,
+            _b: b,
+        })
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+impl RGBFormat for RGB {
+    fn r(&self) -> &u8 {
+        &self._r
+    }
+
+    fn g(&self) -> &u8 {
+        &self._g
+    }
+
+    fn b(&self) -> &u8 {
+        &self._b
+    }
+}
+
+impl From<RGBA> for RGB {
+    fn from(rgba: RGBA) -> Self {
+        rgba._rgb
+    }
+}
+
+impl fmt::Display for RGB {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "rgb({}, {}, {})", self.r(), self.g(), self.b())
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Alpha {
+    _a: f32,
+    _a_u8: u8,
+}
+
+impl Alpha {
+    pub fn new(a: Option<f32>, a_u8: Option<u8>) -> Self {
+        match (a, a_u8) {
+            (Some(a), Some(a_u8)) => Alpha { _a: a, _a_u8: a_u8 },
+            (Some(a), None) => {
+                let a_u8 = (a * 255.0).round() as u8;
+                Alpha { _a: a, _a_u8: a_u8 }
+            }
+            (None, Some(a_u8)) => {
+                let a = (a_u8 as f32) / 255.0;
+                Alpha { _a: a, _a_u8: a_u8 }
+            }
+            (None, None) => Alpha {
+                _a: 1.0,
+                _a_u8: 255,
+            },
+        }
+    }
+
+    pub fn a(&self) -> &f32 {
+        &self._a
+    }
+
+    pub fn a_u8(&self) -> &u8 {
+        &self._a_u8
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct RGBA {
+    _rgb: RGB,
+    _alpha: Alpha,
+}
+
+impl RGBA {
+    pub fn new(
+        r: u8,
+        g: u8,
+        b: u8,
+        a: Option<f32>,
+        a_u8: Option<u8>,
+    ) -> Result<Self, InvalidColourFormat> {
+        let alpha = Alpha::new(a, a_u8);
+        let rgb = RGB::new(r, g, b)?;
+        Ok(Self {
+            _rgb: rgb,
+            _alpha: alpha,
+        })
+    }
+
+    pub fn a(&self) -> &f32 {
+        &self._alpha.a()
+    }
+
+    pub fn a_u8(&self) -> &u8 {
+        &self._alpha.a_u8()
+    }
+
+    fn to_string_u8_alpha(&self) -> String {
+        format!(
+            "rgba({}, {}, {}, {})",
+            self._rgb.r(),
+            self._rgb.g(),
+            self._rgb.b(),
+            self.a_u8()
+        )
+    }
+}
+
+impl RGBFormat for RGBA {
+    fn r(&self) -> &u8 {
+        &self._rgb.r()
+    }
+
+    fn g(&self) -> &u8 {
+        &self._rgb.g()
+    }
+
+    fn b(&self) -> &u8 {
+        &self._rgb.b()
+    }
+}
+
+impl From<RGB> for RGBA {
+    fn from(rgb: RGB) -> Self {
+        Self {
+            _rgb: rgb,
+            _alpha: Alpha {
+                _a: 1.0,
+                _a_u8: 255,
+            },
+        }
+    }
+}
+
+impl From<(RGB, Alpha)> for RGBA {
+    fn from(data: (RGB, Alpha)) -> Self {
+        let (rgb, alpha) = data;
+        Self {
+            _rgb: rgb,
+            _alpha: alpha,
+        }
+    }
+}
+
+impl fmt::Display for RGBA {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "rgba({}, {}, {}, {})",
+            self._rgb.r(),
+            self._rgb.g(),
+            self._rgb.b(),
+            format!("{:.2}", self.a())
+                .trim_end_matches('0')
+                .trim_end_matches('.')
+        )
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct HSV {
-    h: f32,
-    s: f32,
-    v: f32,
+    _h: f32,
+    _s: f32,
+    _v: f32,
 }
 
 impl HSV {
@@ -57,29 +195,33 @@ impl HSV {
         {
             Err(InvalidColourFormat::ArgOutOfBoundsError)
         } else {
-            Ok(Self { h, s, v })
+            Ok(Self {
+                _h: h,
+                _s: s,
+                _v: v,
+            })
         }
     }
 
     // TODO: need to know more about commonly expected hsv formats to make these useful
     pub fn to_string(&self) -> String {
-        format!("hsv({}, {}, {})", self.h, self.s, self.v)
+        format!("hsv({}, {}, {})", self._h, self._s, self._v)
     }
 
     pub fn to_string_as_percent(&self) -> String {
-        format!("hsv({}, {}%, {}%)", self.h, self.s, self.v)
+        format!("hsv({}, {}%, {}%)", self._h, self._s, self._v)
     }
 
     pub fn h(&self) -> &f32 {
-        &self.h
+        &self._h
     }
 
     pub fn s(&self) -> &f32 {
-        &self.s
+        &self._s
     }
 
     pub fn v(&self) -> &f32 {
-        &self.v
+        &self._v
     }
 }
 
@@ -157,9 +299,9 @@ mod tests {
         assert_eq!(
             rgb,
             Ok(RGB {
-                r: 255,
-                g: 0,
-                b: 255
+                _r: 255,
+                _g: 0,
+                _b: 255
             })
         );
     }
@@ -183,9 +325,9 @@ mod tests {
         assert_eq!(
             hsv,
             Ok(HSV {
-                h: 300.0,
-                s: 100.0,
-                v: 100.0
+                _h: 300.0,
+                _s: 100.0,
+                _v: 100.0
             })
         );
     }

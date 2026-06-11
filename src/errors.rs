@@ -7,6 +7,8 @@ pub enum InvalidColourFormat {
     ArgOutOfBoundsError,
     FailedConversionError,
     FormatNotRecognisedError,
+    MultipleAlphaFormatsError,
+    NoAlphaFormatProvidedError,
     HexParseError(num::ParseIntError),
 }
 

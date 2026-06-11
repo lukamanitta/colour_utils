@@ -1,4 +1,5 @@
 use crate::errors::InvalidColourFormat;
+use crate::formats::RGBFormat;
 use crate::Colour;
 
 fn clamp(value: f32, min: f32, max: f32) -> f32 {
