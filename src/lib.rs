@@ -15,7 +15,7 @@ const HSV_REGEX_STRING: &str = r"^hsv\((\d+(?:\.\d+)?), (\d+(?:\.\d+)?), (\d+(?:
 const HEX_REGEX_STRING: &str = r"^#(\d|\w{6})$";
 const HEX_ALPHA_REGEX_STRING: &str = r"^#(\d|\w{6})(\d|\w{2})$";
 
-#[derive(Clone)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Colour {
     rgb: RGB,
     rgba: RGBA,
