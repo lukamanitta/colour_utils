@@ -118,9 +118,19 @@ impl RGBA {
         &self._alpha.a_u8()
     }
 
-    fn to_string_u8_alpha(&self) -> String {
+    pub fn to_string_u8_alpha(&self) -> String {
         format!(
             "rgba({}, {}, {}, {})",
+            self._rgb.r(),
+            self._rgb.g(),
+            self._rgb.b(),
+            self.a_u8()
+        )
+    }
+
+    pub fn to_hex_string(&self) -> String {
+        format!(
+            "{:02x}{:02x}{:02x}{:02x}",
             self._rgb.r(),
             self._rgb.g(),
             self._rgb.b(),
@@ -317,6 +327,21 @@ mod tests {
         let rgb = RGB::new(255, 0, 255).unwrap();
         let rgb_string = rgb.to_string();
         assert_eq!(rgb_string, "rgb(255, 0, 255)");
+    }
+
+    #[test]
+    fn rgba_to_hex_string_works() {
+        let rgba = RGBA::new(255, 0, 255, Some(0.5), None).unwrap();
+        let hex_string = rgba.to_hex_string();
+        assert_eq!(hex_string, "ff00ff80");
+    }
+
+    #[test]
+    fn rgb_to_hexa_string_works() {
+        let rgb = RGB::new(255, 0, 255).unwrap();
+        let rgba = RGBA::from(rgb);
+        let hexa_string = rgba.to_hex_string();
+        assert_eq!(hexa_string, "ff00ffff");
     }
 
     #[test]
