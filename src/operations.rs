@@ -43,7 +43,7 @@ pub fn invert_brightness(colour: &Colour) -> Result<Colour, InvalidColourFormat>
     Colour::new_from_hsv(
         *colour.hsv().h(),
         *colour.hsv().s(),
-        1.0 - *colour.hsv().v(),
+        100.0 - *colour.hsv().v(),
     )
 }
 
@@ -64,8 +64,33 @@ pub fn blend(
 
 #[cfg(test)]
 mod tests {
-    // use super::*;
+    use super::*;
 
     #[test]
     pub fn it_works() {}
+
+    #[test]
+    fn invert_brightness_inverts_v_within_range() {
+        let white = Colour::new("#FFFFFF").unwrap();
+        let black = invert_brightness(&white).unwrap();
+        assert_eq!(black.hex().to_string(), "000000");
+
+        let black_again = invert_brightness(&black).unwrap();
+        assert_eq!(black_again.hex().to_string(), "ffffff");
+    }
+
+    #[test]
+    fn invert_brightness_keeps_hue_and_saturation() {
+        let colour = Colour::new("#FF0000").unwrap();
+        let inverted = invert_brightness(&colour).unwrap();
+        // Hue/saturation preserved, value flipped (100 -> 0).
+        assert_eq!(inverted.hsv().h().to_string(), "0");
+        assert_eq!(inverted.hsv().s().to_string(), "100");
+    }
+
+    #[test]
+    fn invert_returns_complement() {
+        let colour = Colour::new("#FF0000").unwrap();
+        assert_eq!(invert(&colour).unwrap().hex().to_string(), "00ffff");
+    }
 }
