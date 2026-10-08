@@ -6,7 +6,7 @@ pub mod operations;
 use regex::Regex;
 
 use errors::InvalidColourFormat;
-use formats::{Alpha, Hex, RGBFormat, HSV, RGB, RGBA};
+use formats::{Hex, RGBFormat, HSV, RGB, RGBA};
 
 const RGB_REGEX_STRING: &str = r"^rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)$";
 const RGBA_REGEX_STRING: &str = r"^rgba\((\d{1,3}), (\d{1,3}), (\d{1,3}), (0|1|0?\.\d+)\)$";

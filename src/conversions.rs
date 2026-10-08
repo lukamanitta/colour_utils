@@ -1,5 +1,5 @@
 use crate::errors::InvalidColourFormat;
-use crate::formats::{Alpha, Hex, RGBFormat, HSV, RGB, RGBA};
+use crate::formats::{Hex, RGBFormat, HSV, RGB};
 
 pub fn rgb_to_hsv(rgb: &RGB) -> Result<HSV, InvalidColourFormat> {
     // Adapted from https://www.geeksforgeeks.org/program-change-rgb-color-model-hsv-color-model/
